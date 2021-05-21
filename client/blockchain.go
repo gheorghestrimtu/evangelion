@@ -1,7 +1,7 @@
 package client
 
 import (
-	"../config"
+	"chainlink-sdet-golang-project/config"
 	"fmt"
 	"math/big"
 	"strings"

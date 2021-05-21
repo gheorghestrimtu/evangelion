@@ -1,9 +1,10 @@
 package contracts
 
 import (
-	"../client"
-	"../config"
+	"chainlink-sdet-golang-project/client"
+	"chainlink-sdet-golang-project/config"
 	"context"
+	"fmt"
 	"math/big"
 
 	. "github.com/onsi/ginkgo"
@@ -36,10 +37,11 @@ var _ = Describe("Client", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 
 		// Interact with contract
-		_, err = aggregatorInstance.GetRoundData(context.Background(), value)
+		roundValue, err := aggregatorInstance.GetRoundData(context.Background(), value)
 		Expect(err).ShouldNot(HaveOccurred())
 		//val, err := storeInstance.Get(context.Background())
-		//fmt.Println("printval")
+		fmt.Println("adsfd")
+		fmt.Println(roundValue)
 		//fmt.Println(&val)
 		//Expect(err).ShouldNot(HaveOccurred())
 		//Expect(val).To(Equal(value))

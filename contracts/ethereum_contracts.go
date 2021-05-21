@@ -1,8 +1,8 @@
 package contracts
 
 import (
-	"../client"
-	"../contracts/ethereum"
+	"chainlink-sdet-golang-project/client"
+	"chainlink-sdet-golang-project/contracts/ethereum"
 	"context"
 	"math/big"
 
@@ -31,7 +31,7 @@ func NewEthereumAggregator(
 }
 
 func NewEthereumAggregatorContract(ethClient *client.EthereumClient, fromWallet client.BlockchainWallet) (Aggregator, error) {
-	instance, err := ethereum.NewAccessControlledAggregator(common.Address{0xF570deEffF684D964dc3E15E1F9414283E3f7419}, ethClient.Client)
+	instance, err := ethereum.NewAccessControlledAggregator(common.HexToAddress("F570deEffF684D964dc3E15E1F9414283E3f7419"), ethClient.Client)
 	if err != nil {
 		return nil, err
 	}
