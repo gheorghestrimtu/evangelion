@@ -23,9 +23,11 @@ var _ = Describe("Client", func() {
 
 	DescribeTable("interact with the aggregator contract", func(
 		initFunc client.BlockchainNetworkInit,
-		value *big.Int,
+		feedContractAddress string,
+		roundId uint32,
+		deviationThreshold int,
 	) {
-		// Deploy contract
+		// Instantiate contract
 		networkConfig, err := initFunc(conf)
 		Expect(err).ShouldNot(HaveOccurred())
 		client, err := client.NewEthereumClient(networkConfig)
@@ -33,22 +35,37 @@ var _ = Describe("Client", func() {
 		wallets, err := networkConfig.Wallets()
 		Expect(err).ShouldNot(HaveOccurred())
 
-		aggregatorInstance, err := NewEthereumAggregatorContract(client, wallets.Default())
+		aggregatorInstance, err := NewEthereumAggregatorContract(client, wallets.Default(), feedContractAddress)
 		Expect(err).ShouldNot(HaveOccurred())
 
 		// Interact with contract
-		description, err := aggregatorInstance.Description(context.Background())
-		Expect(err).ShouldNot(HaveOccurred())
-		fmt.Println(description)
 
-		roundData, err := aggregatorInstance.GetRoundData(context.Background(), value)
+		// Get oracles
+		oracles, err := aggregatorInstance.GetOracles(context.Background())
 		Expect(err).ShouldNot(HaveOccurred())
-		fmt.Println(roundData.Answer)
+
+		// Get median value for round
+		roundData, err := aggregatorInstance.GetRoundData(context.Background(), big.NewInt(int64(roundId)))
+		Expect(err).ShouldNot(HaveOccurred())
+
+		medianValue := roundData.Answer
+		fmt.Println(medianValue)
+
+		// Get round value for oracle
+		for i := 0; i < len(oracles); i++ {
+			oracleRoundData, err := aggregatorInstance.OracleRoundState(context.Background(), oracles[i], roundId)
+			Expect(err).ShouldNot(HaveOccurred())
+			fmt.Println(oracleRoundData.EligibleToSubmit)
+			fmt.Println(oracleRoundData.PaymentAmount)
+		}
+
 		//val, err := storeInstance.Get(context.Background())
 		//fmt.Println(&val)
 		//Expect(err).ShouldNot(HaveOccurred())
-		//Expect(val).To(Equal(value))
+		//Expect(val).To(Equal(roundId))
 	},
-		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, big.NewInt(18832)),
+		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(2400), 10),
+		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(10034), 10),
+		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(15342), 10),
 	)
 })

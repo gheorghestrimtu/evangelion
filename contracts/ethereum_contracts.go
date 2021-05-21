@@ -30,8 +30,8 @@ func NewEthereumAggregator(
 	}
 }
 
-func NewEthereumAggregatorContract(ethClient *client.EthereumClient, fromWallet client.BlockchainWallet) (Aggregator, error) {
-	instance, err := ethereum.NewAccessControlledAggregator(common.HexToAddress("0xF570deEffF684D964dc3E15E1F9414283E3f7419"), ethClient.Client)
+func NewEthereumAggregatorContract(ethClient *client.EthereumClient, fromWallet client.BlockchainWallet, contractAddress string) (Aggregator, error) {
+	instance, err := ethereum.NewAccessControlledAggregator(common.HexToAddress(contractAddress), ethClient.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -61,4 +61,31 @@ func (e *EthereumAggregator) Description(ctxt context.Context) (string, error) {
 		Context: ctxt,
 	}
 	return e.aggregator.Description(opts)
+}
+
+func (e *EthereumAggregator) GetOracles(ctxt context.Context) ([]common.Address, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(e.callerWallet.Address()),
+		Pending: true,
+		Context: ctxt,
+	}
+	return e.aggregator.GetOracles(opts)
+}
+
+func (e *EthereumAggregator) OracleRoundState(ctxt context.Context, _oracle common.Address, _queriedRoundId uint32) (struct {
+	EligibleToSubmit bool
+	RoundId          uint32
+	LatestSubmission *big.Int
+	StartedAt        uint64
+	Timeout          uint64
+	AvailableFunds   *big.Int
+	OracleCount      uint8
+	PaymentAmount    *big.Int
+}, error){
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(e.callerWallet.Address()),
+		Pending: true,
+		Context: ctxt,
+	}
+	return e.aggregator.OracleRoundState(opts, _oracle, _queriedRoundId)
 }
