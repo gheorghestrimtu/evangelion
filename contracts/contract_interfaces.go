@@ -13,4 +13,5 @@ type Aggregator interface {
 		UpdatedAt       *big.Int
 		AnsweredInRound *big.Int
 	}, error)
+	Description(context.Context) (string, error)
 }

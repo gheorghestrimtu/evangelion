@@ -31,7 +31,7 @@ func NewEthereumAggregator(
 }
 
 func NewEthereumAggregatorContract(ethClient *client.EthereumClient, fromWallet client.BlockchainWallet) (Aggregator, error) {
-	instance, err := ethereum.NewAccessControlledAggregator(common.HexToAddress("F570deEffF684D964dc3E15E1F9414283E3f7419"), ethClient.Client)
+	instance, err := ethereum.NewAccessControlledAggregator(common.HexToAddress("0xF570deEffF684D964dc3E15E1F9414283E3f7419"), ethClient.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -52,4 +52,13 @@ func (e *EthereumAggregator) GetRoundData(ctxt context.Context, _roundId *big.In
 		Context: ctxt,
 	}
 	return e.aggregator.GetRoundData(opts, _roundId)
+}
+
+func (e *EthereumAggregator) Description(ctxt context.Context) (string, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(e.callerWallet.Address()),
+		Pending: true,
+		Context: ctxt,
+	}
+	return e.aggregator.Description(opts)
 }

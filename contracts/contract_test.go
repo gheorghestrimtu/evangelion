@@ -37,11 +37,14 @@ var _ = Describe("Client", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 
 		// Interact with contract
-		roundValue, err := aggregatorInstance.GetRoundData(context.Background(), value)
+		description, err := aggregatorInstance.Description(context.Background())
 		Expect(err).ShouldNot(HaveOccurred())
+		fmt.Println(description)
+
+		roundData, err := aggregatorInstance.GetRoundData(context.Background(), value)
+		Expect(err).ShouldNot(HaveOccurred())
+		fmt.Println(roundData.Answer)
 		//val, err := storeInstance.Get(context.Background())
-		fmt.Println("adsfd")
-		fmt.Println(roundValue)
 		//fmt.Println(&val)
 		//Expect(err).ShouldNot(HaveOccurred())
 		//Expect(val).To(Equal(value))
