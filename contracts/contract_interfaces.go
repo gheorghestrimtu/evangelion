@@ -1,6 +1,7 @@
 package contracts
 
 import (
+	"chainlink-sdet-golang-project/contracts/ethereum"
 	"context"
 	"github.com/ethereum/go-ethereum/common"
 	"math/big"
@@ -26,4 +27,5 @@ type Aggregator interface {
 		OracleCount      uint8
 		PaymentAmount    *big.Int
 	}, error)
+	FilterSubmissionReceived(context.Context, []*big.Int, []uint32, []common.Address) (*ethereum.AccessControlledAggregatorSubmissionReceivedIterator, error)
 }

@@ -52,11 +52,11 @@ var _ = Describe("Client", func() {
 		fmt.Println(medianValue)
 
 		// Get round value for oracle
-		for i := 0; i < len(oracles); i++ {
-			oracleRoundData, err := aggregatorInstance.OracleRoundState(context.Background(), oracles[i], roundId)
-			Expect(err).ShouldNot(HaveOccurred())
-			fmt.Println(oracleRoundData.EligibleToSubmit)
-			fmt.Println(oracleRoundData.PaymentAmount)
+		// read events
+		eventsIterator, err := aggregatorInstance.FilterSubmissionReceived(context.Background(), nil, []uint32{roundId}, oracles)
+		for eventsIterator.Next() {
+			fmt.Println(eventsIterator.Event.Oracle)
+			fmt.Println(eventsIterator.Event.Submission)
 		}
 
 		//val, err := storeInstance.Get(context.Background())

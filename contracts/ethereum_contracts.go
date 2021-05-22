@@ -89,3 +89,13 @@ func (e *EthereumAggregator) OracleRoundState(ctxt context.Context, _oracle comm
 	}
 	return e.aggregator.OracleRoundState(opts, _oracle, _queriedRoundId)
 }
+
+func (e *EthereumAggregator) FilterSubmissionReceived(ctxt context.Context, submission []*big.Int, round []uint32, oracle []common.Address) (*ethereum.AccessControlledAggregatorSubmissionReceivedIterator, error) {
+	opts := &bind.FilterOpts{
+		Start: 1,
+		End: nil,
+		Context: ctxt,
+	}
+
+	return e.aggregator.FilterSubmissionReceived(opts, submission, round, oracle)
+}
