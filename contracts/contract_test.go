@@ -4,16 +4,15 @@ import (
 	"chainlink-sdet-golang-project/client"
 	"chainlink-sdet-golang-project/config"
 	"context"
-	"fmt"
-	"math/big"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	"math/big"
 )
 
 var _ = Describe("Client", func() {
 	var conf *config.Config
+	var nrOfPreviousRounds = 5
 
 	BeforeEach(func() {
 		var err error
@@ -24,7 +23,6 @@ var _ = Describe("Client", func() {
 	DescribeTable("interact with the aggregator contract", func(
 		initFunc client.BlockchainNetworkInit,
 		feedContractAddress string,
-		roundId uint32,
 		deviationThreshold int,
 	) {
 		// Instantiate contract
@@ -39,33 +37,38 @@ var _ = Describe("Client", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 
 		// Interact with contract
-
-		// Get oracles
-		oracles, err := aggregatorInstance.GetOracles(context.Background())
+		latestRound, err := aggregatorInstance.LatestRound(context.Background())
 		Expect(err).ShouldNot(HaveOccurred())
 
-		// Get median value for round
-		roundData, err := aggregatorInstance.GetRoundData(context.Background(), big.NewInt(int64(roundId)))
-		Expect(err).ShouldNot(HaveOccurred())
+		for i := 0; i < nrOfPreviousRounds; i++ {
+			medianValue, err := aggregatorInstance.GetAnswer(context.Background(), latestRound)
+			Expect(err).ShouldNot(HaveOccurred())
 
-		medianValue := roundData.Answer
-		fmt.Println(medianValue)
+			eventsIterator, err := aggregatorInstance.FilterSubmissionReceived(context.Background(), nil, []uint32{uint32(latestRound.Uint64())}, nil)
+			Expect(err).ShouldNot(HaveOccurred())
 
-		// Get round value for oracle
-		// read events
-		eventsIterator, err := aggregatorInstance.FilterSubmissionReceived(context.Background(), nil, []uint32{roundId}, oracles)
-		for eventsIterator.Next() {
-			fmt.Println(eventsIterator.Event.Oracle)
-			fmt.Println(eventsIterator.Event.Submission)
+			for eventsIterator.Next() {
+				oracleSubmission := eventsIterator.Event.Submission
+
+				medianValueFloat := new(big.Float).SetInt(medianValue)
+				oracleSubmissionFloat := new(big.Float).SetInt(oracleSubmission)
+
+				// calculate percentage difference
+				subValue := big.NewFloat(0).Sub(medianValueFloat, oracleSubmissionFloat)
+				absValue := big.NewFloat(0).Abs(subValue)
+				addValue := big.NewFloat(0).Add(medianValueFloat, oracleSubmissionFloat)
+				denominator := big.NewFloat(0).Quo(addValue, big.NewFloat(2))
+				divResult := big.NewFloat(0).Quo(absValue, denominator)
+				percentageDifference := big.NewFloat(0).Mul(divResult, big.NewFloat(100))
+
+				Expect(percentageDifference.Float64()).Should(BeNumerically("<", deviationThreshold))
+			}
+			err = eventsIterator.Error()
+			Expect(err).ShouldNot(HaveOccurred())
+
+			latestRound.Sub(latestRound, big.NewInt(1))
 		}
-
-		//val, err := storeInstance.Get(context.Background())
-		//fmt.Println(&val)
-		//Expect(err).ShouldNot(HaveOccurred())
-		//Expect(val).To(Equal(roundId))
 	},
-		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(2400), 10),
-		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(10034), 10),
-		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", uint32(15342), 10),
+		Entry("on Ethereum Mainnet with round id", client.NewMainnetNetwork, "0xF570deEffF684D964dc3E15E1F9414283E3f7419", 10),
 	)
 })

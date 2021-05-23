@@ -28,4 +28,6 @@ type Aggregator interface {
 		PaymentAmount    *big.Int
 	}, error)
 	FilterSubmissionReceived(context.Context, []*big.Int, []uint32, []common.Address) (*ethereum.AccessControlledAggregatorSubmissionReceivedIterator, error)
+	LatestRound(context.Context) (*big.Int, error)
+	GetAnswer(context.Context, *big.Int) (*big.Int, error)
 }

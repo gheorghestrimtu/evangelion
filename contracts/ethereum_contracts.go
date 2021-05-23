@@ -81,7 +81,7 @@ func (e *EthereumAggregator) OracleRoundState(ctxt context.Context, _oracle comm
 	AvailableFunds   *big.Int
 	OracleCount      uint8
 	PaymentAmount    *big.Int
-}, error){
+}, error) {
 	opts := &bind.CallOpts{
 		From:    common.HexToAddress(e.callerWallet.Address()),
 		Pending: true,
@@ -90,12 +90,29 @@ func (e *EthereumAggregator) OracleRoundState(ctxt context.Context, _oracle comm
 	return e.aggregator.OracleRoundState(opts, _oracle, _queriedRoundId)
 }
 
-func (e *EthereumAggregator) FilterSubmissionReceived(ctxt context.Context, submission []*big.Int, round []uint32, oracle []common.Address) (*ethereum.AccessControlledAggregatorSubmissionReceivedIterator, error) {
-	opts := &bind.FilterOpts{
-		Start: 1,
-		End: nil,
+func (e *EthereumAggregator) LatestRound(ctxt context.Context) (*big.Int, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(e.callerWallet.Address()),
+		Pending: true,
 		Context: ctxt,
 	}
+	return e.aggregator.LatestRound(opts)
+}
 
+func (e *EthereumAggregator) GetAnswer(ctxt context.Context, _roundId *big.Int) (*big.Int, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(e.callerWallet.Address()),
+		Pending: true,
+		Context: ctxt,
+	}
+	return e.aggregator.GetAnswer(opts, _roundId)
+}
+
+func (e *EthereumAggregator) FilterSubmissionReceived(ctxt context.Context, submission []*big.Int, round []uint32, oracle []common.Address) (*ethereum.AccessControlledAggregatorSubmissionReceivedIterator, error) {
+	opts := &bind.FilterOpts{
+		Start:   1,
+		End:     nil,
+		Context: ctxt,
+	}
 	return e.aggregator.FilterSubmissionReceived(opts, submission, round, oracle)
 }
