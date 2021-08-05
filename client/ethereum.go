@@ -163,6 +163,39 @@ func (e *EthereumClient) TransactionOpts(
 	return opts, nil
 }
 
+func (e *EthereumClient) TransactionOptsWithCtx(
+	from BlockchainWallet,
+	to common.Address,
+	value *big.Int,
+	data common.Hash,
+	ctx context.Context,
+) (*bind.TransactOpts, error) {
+	callMsg, err := e.TransactionCallMessage(from, to, value, data)
+	if err != nil {
+		return nil, err
+	}
+	nonce, err := e.Client.PendingNonceAt(context.Background(), common.HexToAddress(from.Address()))
+	if err != nil {
+		return nil, err
+	}
+	privateKey, err := crypto.HexToECDSA(from.PrivateKey())
+	if err != nil {
+		return nil, fmt.Errorf("invalid private key: %v", err)
+	}
+	opts, err := bind.NewKeyedTransactorWithChainID(privateKey, e.Network.ChainID())
+	if err != nil {
+		return nil, err
+	}
+	opts.From = callMsg.From
+	opts.Nonce = big.NewInt(int64(nonce))
+	opts.Value = value
+	opts.GasPrice = callMsg.GasPrice
+	opts.GasLimit = callMsg.Gas
+	opts.Context = ctx
+
+	return opts, nil
+}
+
 // WaitForTransaction helper function that waits for a specified transaction to clear
 func (e *EthereumClient) WaitForTransaction(transactionHash common.Hash) error {
 	headerChannel := make(chan *types.Header)

@@ -10,7 +10,7 @@ solc_versions = ["v0.4", "v0.6", "v0.7"]
 rootdir = "./artifacts/contracts/ethereum/"
 targetdir = "./contracts/ethereum"
 
-used_contract_names = ["FluxAggregator", "VRF", "OffchainAggregator", "LinkToken", "AccessControlledAggregator"]
+used_contract_names = ["ALPHA", "UniswapV2Router02"]
 
 print("Locally installing hardhat...")
 subprocess.run('npm install --save-dev hardhat', shell=True, check=True)
@@ -20,6 +20,10 @@ with open("hardhat.config.js", "w") as hardhat_config:
     hardhat_config.write("""module.exports = {
 solidity: {
     compilers: [
+    {
+        version: "0.8.3",
+        settings: {}
+    },
     {
         version: "0.8.0",
         settings: {}

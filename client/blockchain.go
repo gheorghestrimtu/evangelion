@@ -17,6 +17,7 @@ const (
 	EthereumKovanID   BlockchainNetworkID = "ethereum_kovan"
 	EthereumGoerliID  BlockchainNetworkID = "ethereum_goerli"
 	EthereumMainnetID BlockchainNetworkID = "ethereum_main"
+	EthereumRopstenID BlockchainNetworkID = "ethereum_ropsten"
 )
 
 // BlockchainNetwork is the interface that when implemented, defines a new blockchain network that can be tested against
@@ -67,6 +68,12 @@ func NewGoerliNetwork(conf *config.Config) (BlockchainNetwork, error) {
 func NewMainnetNetwork(conf *config.Config) (BlockchainNetwork, error) {
 	return newEthereumNetwork(conf, EthereumMainnetID)
 }
+
+// NewRopstenNetwork prepares settings for a connection to the Mainnet
+func NewRopstenNetwork(conf *config.Config) (BlockchainNetwork, error) {
+	return newEthereumNetwork(conf, EthereumRopstenID)
+}
+
 
 // ID returns the readable name of the EVM network
 func (e *EthereumNetwork) ID() string {

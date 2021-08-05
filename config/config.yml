@@ -11,3 +11,27 @@ networks:
         transaction_limit: 958108
         transaction_timeout: 120000000000
         gas_estimation_buffer: 100000
+    ethereum_ropsten:
+        name: "Ropsten Test Network"
+        url: "wss://ropsten.infura.io/ws/v3/ede2571fce3f4158a320bae270fd0a30"
+        chain_id: 3
+        private_keys:
+            - 854616eab48fbcd0e5410a9374ee468f1d3a70c811c60399ea6a6ee29a26d4c1    # owner
+            - 6cd57e1c12c7a444a5518d924409e227131a82dc6e9159fbc20dc9040d153a9c    # node 1
+            - 78675b505a7eae7f0b772fb7c14130dbf36cd8812b077ee75a2a2016a8c5b533    # node 2
+            - 7d516fbafe80ea9167c39931c8d02797377ede397fbf9ee7330e98459a56ab9a    # node 3
+            - 58027c257bf0111f54febd59c971501058e76865943564dab4a2cb14036da3ba    # node 4
+            - 7c947dab8d8ca5fbd8584e605507d9890dd3c205dd2576a35f9e06c8f16d4acf    # node 5
+#            - 9215bfa423b94b79046dad4e721fe0284b61128709896cbee8c0b2123c757d60    # buyer 2
+        transaction_limit: 958108
+        transaction_timeout: 120000000000
+        gas_estimation_buffer: 1000000
+    ethereum_goerli:
+        name: "Goerli Test Network"
+        url: "wss://goerli.infura.io/ws/v3/9e8290567b3244cbba9ed13b77894f4f"
+        chain_id: 5
+        private_keys:
+            - 854616eab48fbcd0e5410a9374ee468f1d3a70c811c60399ea6a6ee29a26d4c1
+        transaction_limit: 958108
+        transaction_timeout: 120000000000
+        gas_estimation_buffer: 1000000
